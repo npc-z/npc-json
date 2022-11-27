@@ -1,0 +1,9 @@
+{
+    "name": "allen",
+    "age": 18,
+    // comment here
+    "friends": [
+        "bob",
+        "frank"
+    ]
+}
