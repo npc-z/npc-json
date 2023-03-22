@@ -1,4 +1,5 @@
 import json
+
 import npc_json
 
 
