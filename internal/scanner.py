@@ -13,10 +13,23 @@ class InvalidCharacter(NPCJSONException):
     ...
 
 
+class InvalidFloat(NPCJSONException):
+    ...
+
+
+class InvalidString(NPCJSONException):
+    ...
+
+
+class UnClosedQuote(NPCJSONException):
+    ...
+
+
 class TokenType(Enum):
     INT = "int"
     FLOAT = "float"
     STRING = "string"
+    NULL = "null"
     LEFT_CURLY = "{"
     RIGHT_CURLY = "}"
     LEFT_SQUARE = "["
@@ -52,6 +65,15 @@ class Scanner:
         if self.char == "/" and self.peek() == "/":
             self.skip_comment()
             return self.next_token()
+
+        if self.is_digit(self.char):
+            return self.parse_number()
+
+        if self.char == "n":
+            return self.parse_null()
+
+        if self.char == '"':
+            return self.parse_string()
 
         if self.char == "[":
             self.advance()
@@ -107,3 +129,71 @@ class Scanner:
         self.advance()
         while self.pos < self.length and self.char != "\n":
             self.advance()
+
+    @staticmethod
+    def is_digit(char: str):
+        return ord("0") <= ord(char) <= ord("9")
+
+    @staticmethod
+    def is_alpha(char: str):
+        return (ord("a") <= ord(char) <= ord("z")) or (
+            ord("A") <= ord(char) <= ord("Z")
+        )
+
+    def is_alpha_digit(self, char: str):
+        return self.is_digit(char) or self.is_alpha(char)
+
+    def parse_number(self):
+        n = self.char
+        self.advance()
+        while self.pos < self.length and self.is_digit(self.char):
+            n += self.char
+            self.advance()
+
+        if self.char == ".":
+            if not self.is_digit(self.peek()):
+                raise InvalidFloat()
+
+            n += self.char
+            self.advance()
+            while self.pos < self.length and self.is_digit(self.char):
+                n += self.char
+                self.advance()
+            return Token(value=n, type=TokenType.FLOAT)
+        else:
+            return Token(value=n, type=TokenType.INT)
+
+    def parse_null(self):
+        s = self.char
+        self.advance()
+        while self.pos < self.length and self.is_alpha_digit(self.char):
+            s += self.char
+            self.advance()
+
+        if s == TokenType.NULL.value:
+            return Token(value=s, type=TokenType.NULL)
+
+        raise InvalidString(s)
+
+    def parse_string(self):
+        self.advance()
+        s = ""
+        if self.is_alpha(self.char):
+            s += self.char
+            self.advance()
+        else:
+            raise InvalidString()
+
+        while (
+            self.pos < self.length
+            and self.is_alpha_digit(self.char)
+            and self.char != '"'
+        ):
+            s += self.char
+            self.advance()
+
+        if self.char != '"':
+            raise UnClosedQuote()
+
+        self.advance()
+        return Token(value=s, type=TokenType.STRING)
