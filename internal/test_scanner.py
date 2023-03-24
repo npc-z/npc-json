@@ -2,15 +2,13 @@ from typing import Union
 
 import pytest
 
-from internal.scanner import (
+from internal.exception import (
     InvalidCharacter,
     InvalidFloat,
     InvalidString,
-    Scanner,
-    Token,
-    TokenType,
     UnClosedQuote,
 )
+from internal.scanner import Scanner, Token, TokenType
 
 
 def make_punctuation_token(punctuation: str):

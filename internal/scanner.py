@@ -2,27 +2,13 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List
 
+from internal.exception import (
+    InvalidCharacter,
+    InvalidFloat,
+    InvalidString,
+    UnClosedQuote,
+)
 from internal.utils import log
-
-
-class NPCJSONException(Exception):
-    pass
-
-
-class InvalidCharacter(NPCJSONException):
-    ...
-
-
-class InvalidFloat(NPCJSONException):
-    ...
-
-
-class InvalidString(NPCJSONException):
-    ...
-
-
-class UnClosedQuote(NPCJSONException):
-    ...
 
 
 class TokenType(Enum):
@@ -38,6 +24,7 @@ class TokenType(Enum):
     COLON = ":"
     SLASH = "/"
     EOF = "eof"
+    UNKNOWN = "unknown"
 
 
 @dataclass(frozen=True, unsafe_hash=True)
