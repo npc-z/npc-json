@@ -47,6 +47,13 @@ class Token:
 
 
 class Scanner:
+    small_alphas = "abcdefghijklmnopqrstuvwxyz"
+    capital_alphas = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    alphas = small_alphas + capital_alphas
+    numbers = "0123456789"
+    valid_string_starter = alphas + "_"
+    valid_string = alphas + numbers + "_"
+
     def __init__(self, content: str) -> None:
         self.content = content
         self.pos = 0
@@ -130,15 +137,11 @@ class Scanner:
         while self.pos < self.length and self.char != "\n":
             self.advance()
 
-    @staticmethod
-    def is_digit(char: str):
-        return ord("0") <= ord(char) <= ord("9")
+    def is_digit(self, char: str):
+        return char in self.numbers
 
-    @staticmethod
-    def is_alpha(char: str):
-        return (ord("a") <= ord(char) <= ord("z")) or (
-            ord("A") <= ord(char) <= ord("Z")
-        )
+    def is_alpha(self, char: str):
+        return char in self.alphas
 
     def is_alpha_digit(self, char: str):
         return self.is_digit(char) or self.is_alpha(char)
@@ -178,7 +181,7 @@ class Scanner:
     def parse_string(self):
         self.advance()
         s = ""
-        if self.is_alpha(self.char):
+        if self.char in self.valid_string_starter:
             s += self.char
             self.advance()
         else:
@@ -186,7 +189,7 @@ class Scanner:
 
         while (
             self.pos < self.length
-            and self.is_alpha_digit(self.char)
+            and self.char in self.valid_string
             and self.char != '"'
         ):
             s += self.char
