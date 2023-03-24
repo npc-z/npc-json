@@ -147,7 +147,7 @@ def test_scanner_with_null():
 
 def test_scanner_with_string():
     content = """
-        {"name": "bob", "age": 18, "balance": 23.3}
+        {"name": "bob", "age": 18, "balance": 23.3, "_addr": "some_where_"}
     """
     tokens = Scanner(content).scan()
     assert tokens == [
@@ -163,6 +163,10 @@ def test_scanner_with_string():
         make_string_token("balance"),
         make_punctuation_token(":"),
         make_float_token(23.3),
+        make_punctuation_token(","),
+        make_string_token("_addr"),
+        make_punctuation_token(":"),
+        make_string_token("some_where_"),
         make_punctuation_token("}"),
         eof_token(),
     ]
